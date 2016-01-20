@@ -1,0 +1,331 @@
+////////////////common references///////////
+textbox selectedTextbox;
+ button[] b_regPage = new button[50];
+button[] b_hmPage = new button[10];
+textbox[] textboxs = new textbox[3];
+commonReference currentpage;
+//////////////application classes////////////
+public interface commonPage{
+ 
+  public void display(PImage img);
+ 
+} 
+/////////////////////////////Classes for chain of responsibility/////////////////////
+public interface invoker {
+ 
+  void handleRequest( String request );
+  void setSuccessor(invoker next);
+  
+} 
+
+public interface commonReference extends commonPage,invoker {
+   public void overRect(int x , int y); 
+}
+////////////////////concrete class for decorator///////////
+public class concreteClass implements commonPage{
+       PImage Backgroundimage;
+       public void setImage(String img){
+        
+         Backgroundimage = loadImage(img);
+         this.display(Backgroundimage);
+       } 
+       
+       public void display(PImage img){
+           size(290,585);
+           image(img, 0, 0);
+  }
+       
+}
+
+///////////// Class page/////////////
+public class Registration_page implements commonReference{
+  String classname = "Registration_page";
+  PImage Backgroundimage;
+  invoker successor;
+ 
+  public Registration_page(){
+    concreteClass c = new concreteClass();
+    c.setImage("register_Key.jpg");
+    //Backgroundimage = loadImage("register_Key.jpg");
+    keyBoard keyboard = new keyBoard(this);
+    //this.display(Backgroundimage);
+  }
+  
+  public void setBackground(){
+    Backgroundimage = loadImage("register_Key.jpg");
+  }
+  
+  public void display(PImage img){
+   size(290,585);
+   image(img, 0, 0);
+  }
+  
+  public void handleRequest( String request ){
+     System.out.println( " got the request..."+request);
+        if ( request.equalsIgnoreCase("Registration_page") )
+        {
+             currentpage = new Registration_page();
+             //currentpage.setBackground();
+             //currentpage.display(hm.Backgroundimage);
+        }
+        else
+        {
+            if ( successor != null )
+                successor.handleRequest(request);
+        }
+
+    
+   } 
+   
+   public void setSuccessor(invoker next){
+     System.out.println( "succesor is set to  "); 
+     this.successor = next ;
+   }
+  
+  public void overRect(int x, int y)  {
+        System.out.println("x value " + x); 
+        System.out.println("length " + b_regPage.length  );  
+        for( int i = 0 ; i < 41 ; i++){
+          if( x > b_regPage[i].posX && x < b_regPage[i].posX+20 && y > b_regPage[i].posY && y < b_regPage[i].posY+30){
+            System.out.println(b_regPage[i].value);
+            
+           if(b_regPage[i].value == 'S'){
+             currentpage.handleRequest("homepage");
+           }else{
+              selectedTextbox.Update(b_regPage[i].value);    
+            }
+          }
+   
+        }
+ 
+        for(int i = 0 ; i < 3 ; i++){
+            if( x > textboxs[i].posx && x < textboxs[i].posx+100 && y > textboxs[i].posy && y < textboxs[i].posy+20){
+            System.out.println(i+"th box selected"); 
+            selectedTextbox = textboxs[i];
+            }
+        }
+   
+   }
+  
+}
+/////////////////////////////////////////
+//////////////////////class homepage///////
+public class homepage implements commonReference{
+  String classname = "homepage"; 
+  PImage Backgroundimage;
+  invoker successor;
+  public void setBackground(){
+    Backgroundimage = loadImage("homescreen.jpg");
+  }
+  
+  public homepage(){
+    System.out.println("in the home page constructer");
+    Backgroundimage = loadImage("homescreen.jpg");
+    this.display(Backgroundimage);
+  }
+  
+  public void display(PImage img){
+   size(290,585);
+   image(img, 0, 0);
+   //b_hmPage[0] = new button();
+   
+  }
+  
+  public void overRect(int x, int y)  {
+       
+   
+   }
+   
+   public void handleRequest( String request ){
+    
+    System.out.println( " got the request for..." +request );
+        if ( request.equalsIgnoreCase("homepage") )
+        {
+             currentpage = new homepage();
+            // currentpage.setBackground();
+            // currentpage.display(hm.Backgroundimage);
+            
+        }
+        else
+        {
+            if ( successor != null )
+                successor.handleRequest(request);
+        }
+   } 
+   
+   public void setSuccessor(invoker next){
+     System.out.println( "succesor is set to  "); 
+     this.successor = next ;
+   }
+}
+/////////////////////////////////////////
+///////////class for decorator////////////
+public class decorator implements commonPage{
+  
+  public commonPage cp;
+  
+ public decorator(commonPage page){
+  cp = page; 
+ }
+  
+  
+  public void display(PImage img){
+   cp.display(img);
+  }
+  
+}
+
+
+//////////////Class keyboard/////////////
+public class keyBoard extends decorator {
+  
+  public keyBoard(commonPage page){
+    
+    super(page);
+    int x = 15 , y = 345;
+   char firstrow = '1' ;
+   for(int i = 0 ; i <9 ; i++){
+    b_regPage[i] = new button(firstrow , x ,y );
+    System.out.println();
+   // rect(x, y, rectSize-10, rectSize);
+    x += 27;
+    firstrow++;
+  }
+    
+  b_regPage[9] = new button('0' , 260 , 345 );
+  b_regPage[10] = new button('q' , 15 , 383);
+  b_regPage[11] = new button('w' , 42 , 383);
+  b_regPage[12] = new button('e' , 69 , 383);
+  b_regPage[13] = new button('r' , 96 , 383);
+  b_regPage[14] = new button('t' , 123 , 383);
+  b_regPage[15] = new button('y' , 150 , 383);
+  b_regPage[16] = new button('u' , 177 , 383);
+  b_regPage[17] = new button('i' , 204 , 383);
+  b_regPage[18] = new button('o' , 231 , 383);
+  b_regPage[19] = new button('p' , 258 , 383);
+  b_regPage[20] = new button('a' , 29 , 420);
+  b_regPage[21] = new button('s' , 56 , 420);
+  b_regPage[22] = new button('d' , 83 , 420);
+  b_regPage[23] = new button('f' , 110 , 420);
+  b_regPage[24] = new button('g' , 137 , 420);
+  b_regPage[25] = new button('h' , 164 , 420);
+  b_regPage[26] = new button('j' , 191 , 420);
+  b_regPage[27] = new button('k' , 218 , 420);
+  b_regPage[28] = new button('l' , 245 , 420);
+   b_regPage[29] = new button('C' , 15 , 460);
+   b_regPage[30] = new button('C' , 30 , 460);
+   b_regPage[31] = new button('z' , 57 , 460);
+   b_regPage[32] = new button('x' , 84 , 460);
+   b_regPage[33] = new button('c' , 111 , 460);
+   b_regPage[34] = new button('v' , 138 , 460);
+   b_regPage[35] = new button('b' , 165 , 460);
+   b_regPage[36] = new button('n' , 192 , 460);
+   b_regPage[37] = new button('m' , 219 , 460);
+   b_regPage[38] = new button('B' , 246 , 460);
+   b_regPage[39] = new button('B' , 260 , 460);
+   b_regPage[40] = new button('S' , 240 , 105); 
+  }
+  
+}
+/////////////////// Class buttons///////////
+ public class button{
+  char  value;
+  int posX , posY;
+  
+  public button(char c , int x , int y){
+    //PImage b_img = loadImage(img);
+    //image(b_img, 0, 0);
+    value = c;
+    posX = x;
+    posY = y;
+    fill(0,0,0,0);
+    noStroke();  
+    rect(x, y, 20, 30);
+  }
+}
+/////////////////////////////////////////////////
+
+//////////////////Class textBoxes////////////////
+boolean isUpper = false;
+  public class textbox{
+    
+    int posx,posy,h,w;
+    String text="";
+    
+    public textbox(int x,int y,int xw,int xh){
+      posx=x;
+      posy=y;
+      h=xh;
+      y=xw;
+      noStroke();
+      //tint(255,255);
+      fill(100,0,100,0);
+      
+      rect(x, y, xw,xh);  
+    System.out.println("text box created");
+    }
+   public void Update(char c){
+  
+       if(c=='B'){
+        
+      stroke(255);
+      tint(255,255);
+      fill(255,255,255,0);
+     // rect(posx, posy+35, h,w);
+    
+       fill(0);
+       text=text.substring(0,text.length()-1);
+        System.out.println(text.length()+"text: "+text);
+       text(text,posx,posy);
+       }else if(c == 'C'){
+          isUpper = true;
+          System.out.println("isupper " + isUpper);
+       }
+       else{
+           fill(0);
+           String input = c+"" ;
+            System.out.println("isupper " + isUpper);
+           if(isUpper == true){
+              text+=input.toUpperCase();
+              System.out.println("text " + text);
+              isUpper = false;
+           }else{
+             text+=c;
+           }    
+       text(text,posx,posy+20);
+    } 
+    
+    
+    
+   } 
+    
+  }
+
+////////////////////processing code///////////////
+void setup() {
+   Registration_page p =new Registration_page();
+   homepage h = new homepage();
+   p.setBackground();
+   p.display(p.Backgroundimage);
+   
+   textboxs[0] = new textbox(50,170,190,25);
+   textboxs[1] = new textbox(50,240,100,20);
+   textboxs[2] = new textbox(50,310,100,20);
+   currentpage = p;
+   p.setSuccessor(h);
+}
+
+void draw() {
+ // update(mouseX, mouseY);
+  //background(rectColor) 
+}
+
+void update(int x, int y) {
+//  p.overRect(x , y);
+}
+
+void mousePressed() {
+  System.out.println("Mouse press called");
+    //currentpage =  new Registration_page();
+    currentpage.overRect(mouseX, mouseY);
+}
